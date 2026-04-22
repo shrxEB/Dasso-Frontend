@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useState, useEffect } from "react";
-import Lottie from "lottie-react"
+import Lottie from "lottie-react";
 import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,29 +22,40 @@ export default function LoginPage() {
       .then((data) => setAnimationData(data));
   }, []);
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     setError("");
     if (!email || !password) {
-      setError("Please enter both email and password.");
+      setError("Please fill out all fields.");
       return;
     }
-
+    
     setLoading(true);
     try {
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+      const res = await fetch(`${BACKEND_URL}/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: email, password }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+      
+      // Auto-login after signup
       const result = await signIn("credentials", {
-        redirect: false,
+        redirect: true,
         email,
         password,
+        callbackUrl: "/chat",
       });
-
+      
       if (result?.error) {
-        setError("Invalid email or password");
-      } else {
-        // Redirect manually if you want, or handle success
-        window.location.href = "/chat"; // redirect to dashboard/home
+        setError(result.error);
       }
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -55,14 +67,11 @@ export default function LoginPage() {
       {/* LEFT SIDE */}
       <div className="hidden md:flex md:w-1/2 relative items-center justify-center bg-black text-white overflow-hidden">
         
-        {/* Glow effects */}
         <div className="absolute w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-3xl animate-pulse" />
         <div className="absolute w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-3xl top-10 left-10" />
 
-        {/* CONTENT */}
         <div className="relative z-10 flex flex-col items-center text-center space-y-6 px-8">
           
-          {/* LOTTIE ANIMATION */}
           <div className="w-100 h-100">
             {animationData && (
               <Lottie animationData={animationData} loop={true} />
@@ -74,7 +83,7 @@ export default function LoginPage() {
           </h1>
 
           <p className="text-zinc-400 text-lg max-w-md">
-            Real-time chat built for speed, simplicity, and scale.
+            Join Dasso and start chatting in real-time with zero friction.
           </p>
         </div>
       </div>
@@ -85,10 +94,10 @@ export default function LoginPage() {
         <div className="w-full max-w-sm space-y-6">
           
           <h2 className="text-2xl font-semibold text-gray-900">
-            Sign in to Dasso
+            Create your account
           </h2>
 
-          {/* Google Login */}
+          {/* Google Signup */}
           <Button
             onClick={() => signIn("google", { callbackUrl: "/chat" })}
             className="w-full bg-gray-100 text-black text-lg h-11 hover:bg-gray-200 flex items-center justify-center gap-2"
@@ -105,6 +114,17 @@ export default function LoginPage() {
             <Separator className="flex-1" />
             <span className="text-sm text-gray-500">or</span>
             <Separator className="flex-1" />
+          </div>
+
+          {/* Name */}
+          <div className="space-y-1">
+            <label className="text-sm text-gray-600">Name</label>
+            <Input
+              className="bg-white border-gray-300 text-black h-11 text-base"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
 
           {/* Email */}
@@ -124,7 +144,7 @@ export default function LoginPage() {
             <Input
               type="password"
               className="bg-white border-gray-300 text-black h-11 text-base"
-              placeholder="Enter your password"
+              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -132,23 +152,23 @@ export default function LoginPage() {
 
           {/* Submit */}
           <Button 
-            onClick={handleLogin}
+            onClick={handleSignup} 
             disabled={loading}
             className="w-full bg-black text-white hover:bg-gray-800 h-11 text-base"
           >
-            {loading ? "Signing in..." : "Continue"}
+            {loading ? "Creating..." : "Create account"}
           </Button>
 
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           {/* Footer */}
           <p className="text-sm text-gray-500 text-center">
-            Don’t have an account?{" "}
+            Already have an account?{" "}
             <span className="text-black font-medium cursor-pointer"
-             onClick={() => {
-              router.push("/signup")
+            onClick={() => {
+              router.push("/login")
             }}>
-              Sign up
+              Sign in
             </span>
           </p>
         </div>
