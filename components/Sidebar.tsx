@@ -1,4 +1,5 @@
 "use client"
+import { signOut } from "next-auth/react"
 
 const Sidebar = () => {
   return (
@@ -20,7 +21,14 @@ const Sidebar = () => {
             <div className="p-2 hover:bg-[#242424] rounded-md">#design</div>
             <div className="p-2 hover:bg-[#242424] rounded-md">#random</div>
         </div>
-      
+        <div className="mt-auto">
+            <button 
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="w-full text-left p-2 hover:bg-[#242424] text-red-400 rounded-md transition-colors"
+            >
+                Logout
+            </button>
+        </div>
     </div>
   )
 }
