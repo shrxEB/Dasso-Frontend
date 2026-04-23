@@ -12,6 +12,7 @@ interface Message{
 }
 const RoomChat = ({ roomId }: { roomId: string }) => {
   const { data: session } = useSession();
+  const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   
   const token = (session?.user as any)?.backendToken;
   const currentUserId = (session?.user as any)?.id;
@@ -28,7 +29,7 @@ const RoomChat = ({ roomId }: { roomId: string }) => {
     if(!token) return;
     const fetchMessages = async () => {
         try{
-            const res = await fetch(`http://localhost:3001/message/${roomId}`,
+            const res = await fetch(`${BACKEND_URL}/message/${roomId}`,
                 {
                     headers:{
                         Authorization: `Bearer ${token}`,           
@@ -47,7 +48,7 @@ const RoomChat = ({ roomId }: { roomId: string }) => {
 
   //Connect to websockets
   useEffect(() => {
-    const newSocket = io("http://localhost:3001");
+    const newSocket = io(BACKEND_URL);
       setSocket(newSocket);
       newSocket.on("connect", () => {
         newSocket.emit("join_room", roomId);

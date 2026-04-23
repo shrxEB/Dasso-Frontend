@@ -6,6 +6,7 @@ import RoomCard from "./RoomCard";
 
 const Dashboard1 = () => {
   const { data: session } = useSession();
+  const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   const [rooms, setRooms] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [roomName, setRoomName] = useState("");
@@ -13,7 +14,7 @@ const Dashboard1 = () => {
   //Fetch message
   const fetchRooms = async () => {
     try {
-      const res = await fetch("http://localhost:3001/room", {
+      const res = await fetch(`${BACKEND_URL}/room`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,7 +44,7 @@ const Dashboard1 = () => {
   const createRoom = async () => {
     if (!roomName.trim()) return;
     try {
-      const res = await fetch("http://localhost:3001/room", {
+      const res = await fetch(`${BACKEND_URL}/room`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
