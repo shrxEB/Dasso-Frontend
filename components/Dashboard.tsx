@@ -15,7 +15,7 @@ const Dashboard = () => {
           className="text-2xl md:text-3xl
             font-semibold"
         >
-          Agya Gandu!!
+          Welcome 
         </h1>
         <p className="text-gray-400 text-sm">Start chatting in your rooms</p>
       </div>
